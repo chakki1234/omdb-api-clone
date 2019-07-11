@@ -1,0 +1,15 @@
+<% include ./partials/header.ejs %>
+
+<h1>Sign Up</h1>
+
+<form action="/signup" method='POST'>
+ <label for="suemail">Email</label>   
+ <input type="text" id='suemail' placeholder='email' name='username'>
+ <label for="supassword">Password</label>
+ <input type="password" id='supassword' placeholder='password' name="password">
+ <button>Submit</button>
+</form>
+
+<a href="/login">Already a member please login</a>
+
+<% include ./partials/footer.ejs %>

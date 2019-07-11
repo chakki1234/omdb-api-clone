@@ -1,0 +1,20 @@
+<% include ./partials/headernav.ejs %>
+ 
+<div class="container" style='border: 2px solid black;' >
+
+    <div style='background-color: #db5959; border: 3px solid red; border-radius: 10px;'>
+        Here are the results for your search
+    </div>
+
+    <div class="card" style="width: 18rem;">
+            <img src="<%=result.Poster%>" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"><%=result.Title%></h5>
+              <p class="card-text"><%=result.Plot%></p>
+             
+            </div>
+          </div>
+
+</div>    
+
+<% include ./partials/footer.ejs %>

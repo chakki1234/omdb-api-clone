@@ -1,0 +1,126 @@
+<% include ./partials/headernav.ejs %>
+
+<img style = 'border: 2px solid black;' id='imgdis' class="ml-5 mt-5" src="<%=result.Poster%>" alt="No IMAGE" style="width: 30%; display: inline-block;">
+<div class = 'mt-5 p-3' id='dbx'>
+<span class="display-3"><%=result.Title%></span>
+<br>
+<span>Released on: <%=result.Year%></span><span class='ml-5' >Genre: <%=result.Genre%></span><span class='ml-5' >Directed by: <%=result.Director%></span>
+<br>
+<br>
+<% for(var i= 0; i<result.Ratings.length; ++i) {  %>
+        <span class="ml-2" ><%=result.Ratings[i].Source%>: <%=result.Ratings[i].Value%></span>    
+<% } %>
+<br>
+<br>
+<span>Language: <%=result.Language%></span><span class = 'ml-5'>Runtime: <%=result.Runtime%></span>
+<br>
+<br>
+<span style="font-size: 1.5rem;" >Plot:  <%=result.Plot%></span>
+<br>
+<br>
+<span style= 'font-size: 1.5rem;'>Actors: <%=result.Actors%></span>
+<br>
+<br>
+<button  id='like' class="btn btn-dark"> <i style="color: pink" class="fas fa-heart"></i> Like</button>
+<button  id='watched' class="btn btn-dark">Watched</button>
+<button  id='wanttowatch' class="btn btn-dark">Want to watch</button>
+<button class="btn btn-dark">Watch trailer</button>
+
+</div>
+
+<script>
+
+const likeb = document.querySelector(`#like`),
+    watchedb = document.querySelector(`#watched`),
+    wantToWatchb = document.querySelector(`#wanttowatch`);
+
+let likebtnstatus = <%=like%> , watchbtnstatus = <%=watch%>, wtwbtnstatus = <%=wtw%>;
+
+if(<%=like%>==1){
+like.classList.remove('btn-dark');
+like.classList.add('btn-danger');
+}
+
+
+if(<%=watch%>==1){
+watchedb.classList.remove('btn-dark');
+watchedb.classList.add('btn-danger');
+}
+
+if(<%=wtw%>==1){
+wantToWatchb.classList.remove('btn-dark');
+wantToWatchbdb.classList.add('btn-danger');
+}
+
+likeb.addEventListener(`click`, function(){
+ 
+    if(likebtnstatus == 0){
+        likebtnstatus = 1; 
+        console.log(`like-on`);
+let xhr = new XMLHttpRequest();
+xhr.open(`POST`, `/like/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr.send(); 
+} else  if(likebtnstatus == 1){
+        likebtnstatus = 0;
+        console.log(`like-off`);
+        let xhr2 = new XMLHttpRequest();
+xhr2.open(`POST`, `/likedel/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr2.send();    
+}
+    this.classList.toggle('btn-dark');
+    this.classList.toggle('btn-danger');
+});
+
+watchedb.addEventListener(`click`, function(){
+     if(watchbtnstatus == 0){
+         console.log('watch-on');
+         wantToWatchb.style.display = 'none';
+         watchbtnstatus = 1;
+         let xhr = new XMLHttpRequest();
+xhr.open(`POST`, `/watched/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr.send(); 
+     } else  if(watchbtnstatus == 1){
+         console.log('watch-off');
+         wantToWatchb.style.display = 'inline-block';
+        watchbtnstatus = 0;
+         let xhr2 = new XMLHttpRequest();
+xhr2.open(`POST`, `/watcheddel/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr2.send(); 
+     }
+
+    this.classList.toggle('btn-dark');
+    this.classList.toggle('btn-danger');
+    
+
+});
+
+wantToWatchb.addEventListener(`click`, function(){
+   
+    if(wtwbtnstatus == 0){
+        console.log('wtw-on');
+        watchedb.style.display = 'none';
+        wtwbtnstatus = 1;
+        let xhr = new XMLHttpRequest();
+xhr.open(`POST`, `/wanttowatch/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr.send(); 
+    } else  if(wtwbtnstatus == 1){
+        console.log('wtw-off');
+        watchedb.style.display = 'inline-block';
+        wtwbtnstatus = 0;
+        let xhr2 = new XMLHttpRequest();
+xhr2.open(`POST`, `/wanttowatchdel/<%=result.imdbID%>/<%=result.Title%>`, true);
+xhr2.send(); 
+}
+
+    this.classList.toggle('btn-dark');
+    this.classList.toggle('btn-danger');
+
+
+});
+
+
+
+
+</script>
+
+<% include ./partials/footer.ejs %>

@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title><%=title%></title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="/styles.css">
+        <script src="https://kit.fontawesome.com/9303a866dd.js"></script>
+    </head>
+    <body style='background-image: url("https://images.unsplash.com/photo-1558867059-2f675a5a7237?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80");background-size: cover;' >
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="#">MbDB</a>
+            
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                      <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                          <a class="nav-link" href="/dashboard">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/logout">logout</a>
+                        </li>
+                    </ul>       
+                        <input class="form-control mr-sm-2" id='searchbar' type="search" placeholder="Search by title or Imdb id" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" id='subbtn' type="submit">Search</button>
+                    </div>
+                  </nav>

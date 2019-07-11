@@ -1,0 +1,126 @@
+<% include ./partials/headernav.ejs %>
+
+<div class="container" >
+
+    <div class="jumbotron jumbotron-fluid mt-3" id='contentbefore' style='border: 2px solid black;'>
+         <div class="container pl-5">
+             <h1 class="display-4">Welcome to the world of Moives and Tv series</h1>
+             <p class="lead">The one stop place for all your favorite shows</p>
+         </div>
+    </div>
+  
+<div id='content' class="row" style='margin: 0 auto;' >
+</div>
+
+<div id="searchres" class= "row" style='margin: 0 auto;' >
+</div>
+
+</div>
+
+<script>
+
+const conTent =  document.querySelector(`#content`),
+      searchBar = document.querySelector(`#searchbar`),
+      subBtn = document.querySelector(`#subbtn`),
+      contentBefore = document.querySelector(`#contentbefore`),
+      searchRes = document.querySelector(`#searchres`);
+      body = document.querySelector(`body`);
+
+let request = [],
+     movies = [`toy+story`, `cars`, `shrek`, `frozen`, `incredibles`],
+     searchnum = 0;  
+    
+for(let i=0; i<5; ++i){
+     request[i] = new XMLHttpRequest();
+     request[i].onload = function(){
+    let thnil = JSON.parse(this.responseText);
+    conTent.insertAdjacentHTML(`beforeend`, `<div class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
+  <img src="${thnil.Poster}" class="card-img-top" alt='NO IMAGE' >
+  <div class="card-body"> 
+    <h5 class="card-title">${thnil.Title}</h5>
+    <p class="card-text">${thnil.Plot}</p>
+    <a  class = 'btn btn-primary' href='/id/${thnil.imdbID}'>Click here to know more </a>
+  </div>
+</div>`);
+};
+     request[i].open(`GET`, `http://www.omdbapi.com/?t=${movies[i]}&apikey=thewdb `);
+     request[i].send();
+}
+
+let xhr3 = new XMLHttpRequest();
+xhr3.onload = function(){
+     let parsed = JSON.parse(this.responseText);
+     console.log(parsed);
+     contentBefore.style.display = 'none';
+     conTent.style.display = 'none';
+     if(!(searchnum==1)){
+          document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
+     }
+     body.insertAdjacentHTML(`beforeend`, `<div id='senum${searchnum}'  class='row' style='margin: 0 auto; width: 50%;'></div>`);
+     
+     if(parsed.Response=='True'){
+      for(let j=0; j<parsed.Search.length; ++j){
+      document.querySelector(`#senum${searchnum}`).insertAdjacentHTML(`beforeend`, `<div class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
+  <img src="${parsed.Search[j].Poster}" class="card-img-top">
+  <div class="card-body">
+    <h5 class="card-title">${parsed.Search[j].Title}</h5>
+    <a class = 'btn btn-primary' href='/id/${parsed.Search[j].imdbID}'>Click here to know more </a>
+  </div>
+</div>`);
+      }
+     } 
+     if(parsed.Response=='False')
+     {
+          document.querySelector(`#senum${searchnum}`).insertAdjacentHTML(`beforeend`, `<div class="alert alert-success" role="alert">
+  Sorry , we could not find anything related
+</div>`);
+     }
+}
+
+let xhr = new XMLHttpRequest();
+xhr.onload = function(){
+     let parsed = JSON.parse(this.responseText);
+     contentBefore.style.display = 'none';
+     conTent.style.display = 'none';
+     if(!(searchnum==1)){
+          document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
+     }
+     searchRes.insertAdjacentHTML(`beforeend`, `<div id='senum${searchnum}' class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
+  <img src="${parsed.Poster}" class="card-img-top">
+  <div class="card-body">
+    <h5 class="card-title">${parsed.Title}</h5>
+    <p class="card-text">${parsed.Plot}</p>
+    <a class='btn btn-primary' href='/id/${parsed.imdbID}'>Click here to know more </a>
+  </div>
+</div>`);
+
+     // let xhr2 = new XMLHttpRequest();
+     // xhr2.open(`POST`, '/searchroute/id', true);
+     // xhr2.setRequestHeader('Content-Type', 'text/plain');
+     // xhr2.send(this.responseText);
+     // xhr2.onload = function(){
+          // console.log(this.responseText);
+          // document.open();
+          // document.write(this.responseText);
+     //     }
+}
+
+
+subBtn.addEventListener(`click`, ()=>{
+   let  valuesr = searchBar.value ,
+        strreq;
+     searchnum+=1;
+   if(valuesr.indexOf(`tt`)==0){
+xhr.open(`GET`, `http://www.omdbapi.com/?i=${valuesr}&apikey=thewdb`, true);
+xhr.send();
+   } else {
+     strreq = valuesr.replace(/ /g, '+');
+xhr3.open(`GET`, `http://www.omdbapi.com/?s=${strreq}&apikey=thewdb`, true);
+xhr3.send();
+   }
+ });
+
+
+</script>
+
+<% include ./partials/footer.ejs %>

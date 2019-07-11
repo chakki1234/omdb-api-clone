@@ -1,0 +1,22 @@
+.card{
+    border: 0 solid black;
+}
+
+#searchbar{
+    width: 15%;
+}
+
+#dbx{
+    display: inline-block; border: 2px solid black; background-color: #e9ecef; color: #232323;
+    position: relative;
+    width: 60%;
+    height: 55%;
+    left: 7%;
+    top: 0%;
+}
+
+#imgdis{
+    position: relative;
+    height: 50%;
+    top: -22%;
+}
