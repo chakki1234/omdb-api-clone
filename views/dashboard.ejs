@@ -1,5 +1,9 @@
 <% include ./partials/headernav.ejs %>
 
+<div id='heading'  style="background-color: #e97373; border: 4px solid red; border-radius: 10px; width: 50%; margin: 5% auto;height: 5%; color: black; display: none; text-align: center; " >
+Sorry we could not find anything related
+</div>
+
 <div class="container" >
 
     <div class="jumbotron jumbotron-fluid mt-3" id='contentbefore' style='border: 2px solid black;'>
@@ -24,13 +28,14 @@ const conTent =  document.querySelector(`#content`),
       subBtn = document.querySelector(`#subbtn`),
       contentBefore = document.querySelector(`#contentbefore`),
       searchRes = document.querySelector(`#searchres`);
-      body = document.querySelector(`body`);
+      body = document.querySelector(`body`),
+      heading = document.querySelector('#heading');
 
 let request = [],
-     movies = [`toy+story`, `cars`, `shrek`, `frozen`, `incredibles`],
+     movies = [`toy+story+2`, `cars`, `shrek`, `frozen`, `incredibles`, `Home alone`, `white house down`, `avengers endgame`, `titanic`],
      searchnum = 0;  
     
-for(let i=0; i<5; ++i){
+for(let i=0; i<movies.length; ++i){
      request[i] = new XMLHttpRequest();
      request[i].onload = function(){
     let thnil = JSON.parse(this.responseText);
@@ -53,6 +58,7 @@ xhr3.onload = function(){
      console.log(parsed);
      contentBefore.style.display = 'none';
      conTent.style.display = 'none';
+     heading.style.display = 'none';
      if(!(searchnum==1)){
           document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
      }
@@ -71,20 +77,21 @@ xhr3.onload = function(){
      } 
      if(parsed.Response=='False')
      {
-          document.querySelector(`#senum${searchnum}`).insertAdjacentHTML(`beforeend`, `<div class="alert alert-success" role="alert">
-  Sorry , we could not find anything related
-</div>`);
+     heading.style.display = 'block';
      }
 }
 
 let xhr = new XMLHttpRequest();
 xhr.onload = function(){
      let parsed = JSON.parse(this.responseText);
+     console.log(parsed);
      contentBefore.style.display = 'none';
      conTent.style.display = 'none';
+     heading.style.display = 'none';
      if(!(searchnum==1)){
           document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
      }
+     if(parsed.Response=='True'){
      searchRes.insertAdjacentHTML(`beforeend`, `<div id='senum${searchnum}' class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
   <img src="${parsed.Poster}" class="card-img-top">
   <div class="card-body">
@@ -93,16 +100,9 @@ xhr.onload = function(){
     <a class='btn btn-primary' href='/id/${parsed.imdbID}'>Click here to know more </a>
   </div>
 </div>`);
-
-     // let xhr2 = new XMLHttpRequest();
-     // xhr2.open(`POST`, '/searchroute/id', true);
-     // xhr2.setRequestHeader('Content-Type', 'text/plain');
-     // xhr2.send(this.responseText);
-     // xhr2.onload = function(){
-          // console.log(this.responseText);
-          // document.open();
-          // document.write(this.responseText);
-     //     }
+     }
+if(parsed.Response=='False')
+heading.style.display = 'block';
 }
 
 

@@ -50,7 +50,8 @@ let userSchema = new mongoose.Schema({
     wtw:[{
          type: mongoose.Schema.Types.ObjectId,
          ref: 'wtw'
-    }]
+    }],
+    activity: [ String ]
 });
 userSchema.plugin(passportlocalmongoose);
 User = mongoose.model(`user`, userSchema);
@@ -140,6 +141,7 @@ console.log('added a like');
 Like.create({ movie: req.params.name, imdbid: req.params.id, user: req.user.username },(err, created)=>{
 User.findOne({ username: req.user.username }).populate('like').exec((err, found)=>{
 found.like.push(created._id);
+found.activity.push(`You have liked ${req.params.name}`);
 found.save();
 res.send(`done`);
 });
@@ -152,6 +154,7 @@ console.log('added watch');
 Watch.create({ movie: req.params.name, imdbid: req.params.id, user: req.user.username }, (err, created)=>{
 User.findOne({ username: req.user.username }).populate('watch').exec(function(err, found){
 found.watch.push(created._id);
+found.activity.push(`You marked ${req.params.name} as watched`);
 found.save();
 res.send(`done`);
 });
@@ -164,6 +167,7 @@ console.log('added want to watch');
 Wtw.create({ movie: req.params.name, imdbid: req.params.id, user: req.user.username }, (err, created)=>{
 User.findOne({ username: req.user.username }).populate('wtw').exec((err, found)=>{
 found.wtw.push(created._id);
+found.activity.push(`You added  ${req.params.name}  to your wishlist`);
 found.save();
 res.send(`done`);
 });
@@ -172,6 +176,10 @@ res.send(`done`);
 
 app.post(`/likedel/:id/:movie`, (req, res)=>{
  console.log('deleted like');   
+User.findOne({ username: req.user.username }, (err, user)=>{
+user.activity.push(`You have removed ${req.params.movie} from your favourites`);
+user.save();
+});
 Like.findOne({ imdbid: req.params.id, user: req.user.username }, (err, found)=>{
 Like.remove({ _id: found._id }, (err, removed)=>{
     if(err)
@@ -183,19 +191,37 @@ Like.remove({ _id: found._id }, (err, removed)=>{
 });
 
 app.post(`/watcheddel/:id/:movie`, (req, res)=>{
- console.log('deleted watch');   
+req.connection.setTimeout( 1000 * 60 * 10 );
+console.log('deleted watch');   
+User.findOne({ username: req.user.username }, (err, user)=>{
+    user.activity.push(`You have removed ${req.params.movie} from your watched list`);
+    user.save();
+    });
 Watch.findOne({ imdbid: req.params.id, user: req.user.username }, (err, found)=>{
-Watch.remove({ _id: found._id }, (err, removed)=>{
-    if(err)
-    console.log(err);
-    else
-    console.log(removed);
-});
+    if(err){
+        console.log(err);
+    }else{
+        if(found){
+            console.log('VALUE PRESENT');
+            Watch.remove({ _id: found._id }, (err, removed)=>{
+                if(err)
+                console.log(err);
+                else
+                console.log(removed);
+            });
+    }else{
+        console.log('value not found');
+    }
+}
 });
 });
 
 app.post(`/wanttowatchdel/:id/:movie`, (req, res)=>{
 console.log(`deleted want to watch`);    
+User.findOne({ username: req.user.username }, (err, user)=>{
+    user.activity.push(`You have removed ${req.params.movie} from your wish list`);
+    user.save();
+    });
 Wtw.findOne( { imdbid: req.params.id, user: req.user.username }, (err, found)=>{
 Wtw.remove({ _id: found._id }, (err, removed)=>{
     if(err)
@@ -206,8 +232,79 @@ console.log(removed);
 });
 });
 
+app.get(`/likes`, loggedin, (req, res)=>{
+let title = 'favorites';
+res.render(`fav.ejs`, { title: title, user: req.user.username });
+});
+
+app.get(`/watched`,loggedin, (req, res)=>{
+    let title = 'watched';
+    res.render(`watch.ejs`, { title: title, user: req.user.username });
+    });
+    
+app.get(`/wtw`,loggedin, (req, res)=>{
+    let title = 'in line';
+    res.render(`wtw.ejs`, { title: title, user: req.user.username });
+    });
+        
+app.get('/detaillike/:user', (req, res)=>{
+User.findOne({ username: req.params.user }).populate('like').exec((err, found)=>{
+console.log(found);
+res.send(JSON.stringify(found));
+});
+});  
+   
+app.get('/detailwatch/:user', (req, res)=>{
+    User.findOne({ username: req.params.user }).populate('watch').exec((err, found)=>{
+    console.log(found);
+    res.send(JSON.stringify(found));
+    });
+    });
+
+app.get('/detailwtw/:user', (req, res)=>{
+    User.findOne({ username: req.params.user }).populate('wtw').exec((err, found)=>{
+    console.log(found);
+    res.send(JSON.stringify(found));
+    });
+    });
+
+ app.get(`/activity`, loggedin, (req, res)=>{
+     let title = 'activity'; 
+ res.render(`activity.ejs`, { title: title } );
+ }); 
+
+ app.post(`/addtrailer/:movie`, (req, res)=>{
+ User.findOne({ username: req.user.username }, (err, user)=>{ 
+ user.activity.push(`You watched the trailer of ${req.params.movie}`);
+ user.save();
+ });
+ });
+
+app.post('/delact', (req, res)=>{
+console.log('clicked delact');
+User.findOne({ username: req.user.username }, (err, user)=>{
+console.log(user);
+user.activity.splice(0,user.activity.length);
+user.save();
+console.log(user);
+res.send('got it ');
+// console.log(user);
+// console.log(user.activity.length);
+// for(let i=1;i<=user.activity.length;++i){
+// console.log(i);
+// user.activity.pop();
+// console.log(user);
+// }
+
+});
+});
+
+ app.post(`/activitydetail`, (req, res)=>{
+ User.findOne({ username: req.user.username },(err, found)=>{
+ res.send(JSON.stringify(found));
+ });
+ });
+
 app.listen(3000, ()=>{
    console.log(`Server started`); 
 });
-
-

@@ -1,5 +1,11 @@
 <% include ./partials/headernav.ejs %>
 
+<div id='heading' style="background-color: #e97373; border: 4px solid red; border-radius: 10px; width: 50%; margin: 5% auto;height: 5%; color: black; display: none; text-align: center; " >
+Sorry we could not find anything related
+</div>
+    
+
+<div id="content">
 <img style = 'border: 2px solid black;' id='imgdis' class="ml-5 mt-5" src="<%=result.Poster%>" alt="No IMAGE" style="width: 30%; display: inline-block;">
 <div class = 'mt-5 p-3' id='dbx'>
 <span class="display-3"><%=result.Title%></span>
@@ -24,17 +30,33 @@
 <button  id='like' class="btn btn-dark"> <i style="color: pink" class="fas fa-heart"></i> Like</button>
 <button  id='watched' class="btn btn-dark">Watched</button>
 <button  id='wanttowatch' class="btn btn-dark">Want to watch</button>
-<button class="btn btn-dark">Watch trailer</button>
+<button  id="watchtra" class="btn btn-dark">Watch trailer</button>
+</div>
+
+<div style="width: 50%; margin: 0 auto;" id='video' >
+</div>
 
 </div>
+
+<div id="searchres" class= "row" style='margin: 0 auto;width: 50%;' >
+</div>
+
 
 <script>
 
 const likeb = document.querySelector(`#like`),
     watchedb = document.querySelector(`#watched`),
-    wantToWatchb = document.querySelector(`#wanttowatch`);
+    wantToWatchb = document.querySelector(`#wanttowatch`),
+    searchBar = document.querySelector(`#searchbar`),
+    subBtn = document.querySelector(`#subbtn`),
+    body = document.querySelector(`body`),
+    conTent = document.querySelector('#content'),
+    searchRes = document.querySelector(`#searchres`),
+    heading = document.querySelector('#heading');
+    watchTra = document.querySelector(`#watchtra`),
+    video = document.querySelector(`#video`);
 
-let likebtnstatus = <%=like%> , watchbtnstatus = <%=watch%>, wtwbtnstatus = <%=wtw%>;
+let likebtnstatus = <%=like%> , watchbtnstatus = <%=watch%>, wtwbtnstatus = <%=wtw%>, searchnum = 0; 
 
 if(<%=like%>==1){
 like.classList.remove('btn-dark');
@@ -45,11 +67,13 @@ like.classList.add('btn-danger');
 if(<%=watch%>==1){
 watchedb.classList.remove('btn-dark');
 watchedb.classList.add('btn-danger');
+wantToWatchb.style.display = 'none';
 }
 
 if(<%=wtw%>==1){
 wantToWatchb.classList.remove('btn-dark');
-wantToWatchbdb.classList.add('btn-danger');
+wantToWatchb.classList.add('btn-danger');
+watchedb.style.display = 'none';
 }
 
 likeb.addEventListener(`click`, function(){
@@ -77,15 +101,15 @@ watchedb.addEventListener(`click`, function(){
          wantToWatchb.style.display = 'none';
          watchbtnstatus = 1;
          let xhr = new XMLHttpRequest();
-xhr.open(`POST`, `/watched/<%=result.imdbID%>/<%=result.Title%>`, true);
-xhr.send(); 
+         xhr.open(`POST`, `/watched/<%=result.imdbID%>/<%=result.Title%>`, true);
+         xhr.send(); 
      } else  if(watchbtnstatus == 1){
          console.log('watch-off');
          wantToWatchb.style.display = 'inline-block';
-        watchbtnstatus = 0;
+         watchbtnstatus = 0;
          let xhr2 = new XMLHttpRequest();
-xhr2.open(`POST`, `/watcheddel/<%=result.imdbID%>/<%=result.Title%>`, true);
-xhr2.send(); 
+         xhr2.open(`POST`, `/watcheddel/<%=result.imdbID%>/<%=result.Title%>`, true);
+         xhr2.send(); 
      }
 
     this.classList.toggle('btn-dark');
@@ -119,7 +143,84 @@ xhr2.send();
 });
 
 
+let xhr3 = new XMLHttpRequest();
+xhr3.onload = function(){
+     let parsed = JSON.parse(this.responseText);
+     console.log(parsed);
+     conTent.style.display = 'none';
+     heading.style.display = 'none';
+     if(!(searchnum==1)){
+          document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
+     }
+     body.insertAdjacentHTML(`beforeend`, `<div id='senum${searchnum}'  class='row' style='margin: 0 auto; width: 50%;'></div>`);
+     
+     if(parsed.Response=='True'){
+      for(let j=0; j<parsed.Search.length; ++j){
+      document.querySelector(`#senum${searchnum}`).insertAdjacentHTML(`beforeend`, `<div class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
+  <img src="${parsed.Search[j].Poster}" class="card-img-top">
+  <div class="card-body">
+    <h5 class="card-title">${parsed.Search[j].Title}</h5>
+    <a class = 'btn btn-primary' href='/id/${parsed.Search[j].imdbID}'>Click here to know more </a>
+  </div>
+</div>`);
+      }
+     } 
+     if(parsed.Response=='False')
+     {
+        heading.style.display = 'block';
+     }
+}
 
+let xhr = new XMLHttpRequest();
+xhr.onload = function(){
+     let parsed = JSON.parse(this.responseText);
+     conTent.style.display = 'none';
+     heading.style.display = 'none';
+     if(!(searchnum==1)){
+          document.querySelector(`#senum${searchnum-1}`).style.display = 'none'; 
+     }
+     if(parsed.Response=='True'){
+     searchRes.insertAdjacentHTML(`beforeend`, `<div id='senum${searchnum}' class="card col-4 mt-4 pt-4 pb-4" style='display: inline-block; background-color: #e9ecef; color: #232323; border: 2px solid black'>
+  <img src="${parsed.Poster}" class="card-img-top">
+  <div class="card-body">
+    <h5 class="card-title">${parsed.Title}</h5>
+    <p class="card-text">${parsed.Plot}</p>
+    <a class='btn btn-primary' href='/id/${parsed.imdbID}'>Click here to know more </a>
+  </div>
+</div>`);
+} 
+if(parsed.Response=='False')
+   heading.style.display = 'block';
+}
+
+subBtn.addEventListener(`click`, ()=>{
+   let  valuesr = searchBar.value ,
+        strreq;
+     searchnum+=1;
+   if(valuesr.indexOf(`tt`)==0){
+xhr.open(`GET`, `http://www.omdbapi.com/?i=${valuesr}&apikey=thewdb`, true);
+xhr.send();
+   } else {
+     strreq = valuesr.replace(/ /g, '+');
+xhr3.open(`GET`, `http://www.omdbapi.com/?s=${strreq}&apikey=thewdb`, true);
+xhr3.send();
+   }
+ });
+
+watchTra.addEventListener('click', function(){
+let xhr7 = new XMLHttpRequest();
+xhr7.open(`POST`, `/addtrailer/<%=result.Title%>`, true);
+xhr7.send();
+let xhr6 =  new XMLHttpRequest();
+xhr6.onload = function(){
+  let parsed = JSON.parse(this.responseText);
+  video.insertAdjacentHTML(`beforeend`, `<iframe width="1280" height="720" style='width: 100%; margin-bottom:7%;' src='https://www.youtube.com/embed/${parsed.items[0].id.videoId}' frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
+  window.scrollBy(0,1000);
+};
+xhr6.open('GET', `https://www.googleapis.com/youtube/v3/search?part=snippet&q=<%=result.Title%> official trailer&key=AIzaSyB1dazcxVO5ok-UsYisuhMjgYhi8U_q0kE`, true);
+xhr6.setRequestHeader('Accept', `application/json`);
+xhr6.send();
+});
 
 </script>
 

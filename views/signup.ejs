@@ -1,15 +1,19 @@
 <% include ./partials/header.ejs %>
 
+<div id='sbx' >
 <h1>Sign Up</h1>
-
 <form action="/signup" method='POST'>
  <label for="suemail">Email</label>   
- <input type="text" id='suemail' placeholder='email' name='username'>
+ <input type="text" id='suemail' placeholder='email' name='username' style="display: block;" >
+ <br>
  <label for="supassword">Password</label>
- <input type="password" id='supassword' placeholder='password' name="password">
- <button>Submit</button>
+ <input type="password" id='supassword' placeholder='password' name="password" style="display: block;" >
+ <br>
+ <button class="btn btn-danger">Submit</button>
 </form>
 
 <a href="/login">Already a member please login</a>
+</div>
+
 
 <% include ./partials/footer.ejs %>
